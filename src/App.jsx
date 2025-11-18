@@ -1,6 +1,8 @@
+import BottomToolbar from "./components/BottomToolbar";
 import React, { useState, useRef, useEffect } from "react";
 import "./App.css";
 import * as API from "./api";
+import TopNav from "./components/TopNav";
 
 export default function App() {
   const canvasRef = useRef(null);
@@ -512,23 +514,11 @@ export default function App() {
   const handleAIGenerate = async (prompt) => {
     setIsProcessing(true);
     try {
-      // Mock API call
-      const result = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            url: "https://via.placeholder.com/1024x768.png?text=AI+Generated+Image", // Placeholder for AI image
-            isMock: true,
-          });
-        }, 1500);
-      });
-
-      if (result.isMock) showToast("Curve is in AI Mock Mode");
-
+      const result = await API.generateImage(prompt);
       const img = new Image();
       img.onload = () => {
         setImage(img);
         setImageData(result.url);
-        // Reset transforms for new image
         setTransform({ x: 0, y: 0, scale: 1, rotation: 0 });
         saveHistory();
         setIsProcessing(false);
@@ -545,18 +535,7 @@ export default function App() {
     if (!imageData) return;
     setIsProcessing(true);
     try {
-      // Mock API call
-      const result = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            url: "https://via.placeholder.com/1024x768.png?text=AI+Enhanced+Image", // Placeholder for enhanced image
-            isMock: true,
-          });
-        }, 1500);
-      });
-
-      if (result.isMock) showToast("Curve is in AI Mock Mode");
-
+      const result = await API.enhanceImage(imageData);
       const img = new Image();
       img.onload = () => {
         setImage(img);
@@ -577,20 +556,7 @@ export default function App() {
     if (!imageData) return;
     setIsProcessing(true);
     try {
-      // Mock API call
-      const result = await new Promise((resolve) => {
-        setTimeout(() => {
-          resolve({
-            url: `https://via.placeholder.com/${1024 * scale}x${
-              768 * scale
-            }.png?text=AI+Upscaled+${scale}x`, // Placeholder for upscaled image
-            isMock: true,
-          });
-        }, 1500);
-      });
-
-      if (result.isMock) showToast("Curve is in AI Mock Mode");
-
+      const result = await API.upscaleImage(imageData, scale);
       const img = new Image();
       img.onload = () => {
         setImage(img);
@@ -612,57 +578,13 @@ export default function App() {
 
   return (
     <div className={`app ${isDarkMode ? "dark" : "light"}`}>
-      <div className="top-nav glass">
-        <button
-          className="icon-btn"
-          onClick={() => {
-            setImage(null);
-            setTextLayers([]);
-            setHistory([]);
-          }}
-          title="New Session"
-        >
-          <svg
-            className="icon-svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <span className="app-title">Curve</span>
-        <button
-          className="icon-btn"
-          onClick={() => setIsDarkMode(!isDarkMode)}
-          title="Toggle Theme"
-        >
-          {isDarkMode ? (
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-          ) : (
-            <svg className="icon-svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-            </svg>
-          )}
-        </button>
-      </div>
+      <TopNav
+        setImage={setImage}
+        setTextLayers={setTextLayers}
+        setHistory={setHistory}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
+      />
 
       <div className="canvas-container">
         {!image ? (
@@ -703,119 +625,15 @@ export default function App() {
         )}
       </div>
 
-      {image && (
-        <div className="bottom-toolbar glass">
-          <button
-            className="tool-btn"
-            onClick={() => fileInputRef.current?.click()}
-            title="Import"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M13 12H3M13 12l-4-4M13 12l-4 4" />
-            </svg>
-          </button>
-          <button
-            className="tool-btn"
-            onClick={() => setActiveSheet("border")}
-            title="Border Radius"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" />
-            </svg>
-          </button>
-          <button
-            className="tool-btn"
-            onClick={() => setActiveSheet("text")}
-            title="Add Text"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
-          <button
-            className="tool-btn"
-            onClick={() => setActiveSheet("ai")}
-            title="AI Tools"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-          </button>
-          <div className="separator"></div>
-          <button
-            className="tool-btn"
-            onClick={undo}
-            disabled={historyIndex <= 0}
-            title="Undo"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M3 7v6h6M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13" />
-            </svg>
-          </button>
-          <button
-            className="tool-btn"
-            onClick={redo}
-            disabled={historyIndex >= history.length - 1}
-            title="Redo"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M21 7v6h-6M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3L21 13" />
-            </svg>
-          </button>
-          <div className="separator"></div>
-          <button
-            className="tool-btn export-btn"
-            onClick={() => setActiveSheet("export")}
-            title="Export"
-          >
-            <svg
-              className="icon-svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.04 3 5.5m0 0l6 6m0 0l6-6m-6 6v-8" />
-            </svg>
-          </button>
-        </div>
-      )}
+      <BottomToolbar
+        fileInputRef={fileInputRef}
+        setActiveSheet={setActiveSheet}
+        undo={undo}
+        redo={redo}
+        historyIndex={historyIndex}
+        history={history}
+        image={image}
+      />
 
       <input
         ref={fileInputRef}

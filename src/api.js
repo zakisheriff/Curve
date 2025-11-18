@@ -4,11 +4,11 @@
 // API Configuration
 
 const API_KEYS = {
-  openai: "",
-  replicate: "",
+  openai: import.meta.env.VITE_OPENAI_API_KEY || "",
+  replicate: import.meta.env.VITE_REPLICATE_API_KEY || "",
   cloudflare: {
-    accountId: "08f7f44262a28fc9dc17014ba166e627",
-    apiKey: "J1_J3NbFUIB0V4sV6D9FboHU78mDEfRE2i9dzSJ9",
+    accountId: import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID || "",
+    apiKey: import.meta.env.VITE_CLOUDFLARE_API_KEY || "",
   },
 };
 
@@ -377,7 +377,6 @@ const applySharpen = (ctx, width, height) => {
 };
 
 export default {
-  
   generateImage,
   upscaleImage,
   enhanceImage,
