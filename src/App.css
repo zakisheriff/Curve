@@ -715,6 +715,57 @@ body {
   }
 }
 
+/* Crop and AI Expand Styles */
+.text-input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  font-family: inherit;
+  transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dark .text-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.text-input:focus {
+  outline: none;
+  border-color: #0a84ff;
+  box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
+}
+
+.slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slider-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  min-width: 40px;
+  text-align: right;
+}
+
+.dark .slider-value {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Crop Options Grid */
+.secondary-btn.active-tool-btn {
+  background: #0a84ff !important;
+  color: white !important;
+  border-color: #0a84ff !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .top-nav {
