@@ -2709,7 +2709,6 @@ export default function App() {
       {isProcessing && (
         <div className="processing-overlay">
           <div className="spinner"></div>
-          <p className="processing-text">Processing...</p>
         </div>
       )}
 

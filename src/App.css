@@ -100,6 +100,9 @@ body {
   align-items: center;
   justify-content: center;
   padding: 80px 20px 120px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .main-canvas {
@@ -109,6 +112,16 @@ body {
   cursor: grab;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
+  max-width: 600px;
+  max-height: 600px;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: transparent;
 }
 
 .dark .main-canvas {
@@ -119,12 +132,56 @@ body {
   cursor: grabbing;
 }
 
+/* Generated Image and Text Layers */
+#generated-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  z-index: 1;
+  transition: opacity 0.5s;
+}
+
+#text-layers-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.text-layer {
+  position: absolute;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  pointer-events: all;
+  cursor: move;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  user-select: none;
+  text-align: center;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s;
+}
+
+.text-layer.active {
+  outline: 2px dashed #0a84ff;
+  outline-offset: 4px;
+}
+
 /* Empty State */
 .empty-state {
   padding: 60px 40px;
   border-radius: 20px;
   text-align: center;
   animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 1;
 }
 
 @keyframes fadeIn {
@@ -168,6 +225,7 @@ body {
   width: 100%;
   margin: 8px 0;
   letter-spacing: -0.3px;
+  flex-shrink: 0; /* Important for tool-group */
 }
 
 .primary-btn {
@@ -256,7 +314,7 @@ body {
   opacity: 0.7;
 }
 
-/* Bottom Toolbar */
+/* Bottom Toolbar - UPDATED for Horizontal Scroll on Mobile */
 .bottom-toolbar {
   position: fixed;
   bottom: 20px;
@@ -272,6 +330,13 @@ body {
   backdrop-filter: blur(50px);
   border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* --- NEW SCROLLABLE PROPERTIES --- */
+  max-width: calc(100% - 40px);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  /* --- END NEW SCROLLABLE PROPERTIES --- */
 }
 
 .dark .bottom-toolbar {
@@ -304,6 +369,7 @@ body {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   color: #000;
+  flex-shrink: 0; /* Keep buttons from shrinking */
 }
 
 .dark .tool-btn {
@@ -383,20 +449,14 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.dark .sheet-header {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 24px;
 }
 
 .sheet-header h3 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: #000;
-  letter-spacing: -0.4px;
+  letter-spacing: -0.5px;
 }
 
 .dark .sheet-header h3 {
@@ -407,53 +467,26 @@ body {
   width: 32px;
   height: 32px;
   border: none;
-  background: transparent;
-  color: #000;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.dark .sheet-header button {
-  color: #fff;
-}
-
-.sheet-header button:active {
-  opacity: 0.6;
-}
-
-.sheet-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.sheet-header h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.95);
-  letter-spacing: -0.5px;
-}
-
-.sheet-header button {
-  width: 32px;
-  height: 32px;
-  border: none;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.08);
   border-radius: 50%;
   font-size: 18px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #000;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.dark .sheet-header button {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
 .sheet-header button:active {
   transform: scale(0.9);
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.dark .sheet-header button:active {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* Sliders */
@@ -592,6 +625,7 @@ body {
   background: rgba(0, 0, 0, 0.02);
   border-radius: 8px;
   border: 1px solid rgba(0, 0, 0, 0.06);
+  flex-wrap: wrap;
 }
 
 .dark .text-layer-item {
@@ -599,8 +633,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.text-layer-item input {
+.text-layer-item input[type="text"] {
   flex: 1;
+  min-width: 100px;
 }
 
 .color-input {
@@ -662,6 +697,7 @@ body {
   justify-content: center;
   z-index: 3000;
   animation: fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
 }
 
 .spinner {
@@ -715,8 +751,25 @@ body {
   }
 }
 
-/* Crop and AI Expand Styles */
-.text-input {
+/* Crop and AI Expand Styles (Used here for prompt input) */
+.text-input-group {
+  margin-bottom: 16px;
+}
+
+.text-input-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 4px;
+  letter-spacing: -0.2px;
+}
+
+.dark .text-input-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.text-input-area {
   width: 100%;
   padding: 12px;
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -727,15 +780,17 @@ body {
   font-family: inherit;
   transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
     background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  min-height: 100px;
+  resize: vertical;
 }
 
-.dark .text-input {
+.dark .text-input-area {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
   color: #fff;
 }
 
-.text-input:focus {
+.text-input-area:focus {
   outline: none;
   border-color: #0a84ff;
   box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.1);
@@ -759,11 +814,32 @@ body {
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* Crop Options Grid */
+/* Crop Options Grid - adapted for button group */
+.tool-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  padding-bottom: 4px; /* Space for scrollbar/scroll indicator */
+  white-space: nowrap; /* Keep items in a single line */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
 .secondary-btn.active-tool-btn {
   background: #0a84ff !important;
   color: white !important;
   border-color: #0a84ff !important;
+}
+
+/* Custom Styles for Canvas/Three.js integration */
+#three-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  border-radius: 12px;
 }
 
 /* Responsive */
@@ -776,6 +852,7 @@ body {
   .bottom-toolbar {
     bottom: 10px;
     padding: 8px 12px;
+    max-width: calc(100% - 20px); /* Ensure 10px margin on mobile */
   }
 
   .tool-btn {
